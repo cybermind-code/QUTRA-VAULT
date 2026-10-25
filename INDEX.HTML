@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Qutra Vault | Currency Collection Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vault: {
+                            dark: '#0a0b0e',
+                            card: '#12141c',
+                            border: '#2a2e3d',
+                            gold: '#d4af37',
+                            goldLight: '#f3e5ab',
+                            goldDark: '#aa8c2c'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0a0b0e; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .gold-gradient { background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa8c2c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gold-border { border-color: rgba(212, 175, 55, 0.3); }
+        .gold-border:focus { border-color: #d4af37; box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-vault-gold selection:text-black">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-vault-border bg-vault-card/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-vault-gold to-vault-goldDark flex items-center justify-center text-black font-cinzel font-bold text-xl shadow-lg">
+                    <i class="fa-solid fa-vault"></i>
+                </div>
+                <div>
+                    <h1 class="font-cinzel font-bold text-xl sm:text-2xl gold-gradient tracking-wider">QUTRA VAULT</h1>
+                    <p class="text-xs text-gray-400 tracking-widest uppercase font-medium">Numismatic & Currency Archive</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="openAddModal()" class="bg-gradient-to-r from-vault-gold to-vault-goldDark text-black font-semibold px-4 py-2.5 rounded-xl text-sm flex items-center space-x-2 shadow-lg hover:opacity-90 transition-all">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">Add Currency</span>
+                </button>
+                <div class="relative">
+                    <button onclick="toggleMenu()" class="p-2.5 rounded-xl bg-vault-border/50 text-vault-gold hover:bg-vault-border transition-all">
+                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                    </button>
+                    <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-vault-card border border-vault-border rounded-xl shadow-2xl py-2 z-50">
+                        <button onclick="exportData()" class="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-vault-border/50 flex items-center space-x-2">
+                            <i class="fa-solid fa-download text-vault-gold"></i><span>Export Backup (JSON)</span>
+                        </button>
+                        <label class="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-vault-border/50 flex items-center space-x-2 cursor-pointer">
+                            <i class="fa-solid fa-upload text-vault-gold"></i><span>Import Backup</span>
+                            <input type="file" id="importFile" accept=".json" onchange="importData(event)" class="hidden">
+                        </label>
+                        <button onclick="resetVault()" class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-vault-border/50 flex items-center space-x-2 border-t border-vault-border mt-1 pt-2">
+                            <i class="fa-solid fa-trash-can"></i><span>Clear All Vault Data</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- Dashboard Statistics Overview -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-vault-card border border-vault-border rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Items</p>
+                        <h3 id="statTotalItems" class="text-3xl font-cinzel font-bold text-white mt-1">0</h3>
+                    </div>
+                    <div class="p-3 bg-vault-gold/10 text-vault-gold rounded-xl"><i class="fa-solid fa-layer-group text-xl"></i></div>
+                </div>
+            </div>
+            <div class="bg-vault-card border border-vault-border rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Countries</p>
+                        <h3 id="statTotalCountries" class="text-3xl font-cinzel font-bold text-white mt-1">0</h3>
+                    </div>
+                    <div class="p-3 bg-vault-gold/10 text-vault-gold rounded-xl"><i class="fa-solid fa-globe text-xl"></i></div>
+                </div>
+            </div>
+            <div class="bg-vault-card border border-vault-border rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Est. Portfolio Value</p>
+                        <h3 id="statPortfolioValue" class="text-2xl sm:text-3xl font-cinzel font-bold gold-gradient mt-1">QAR 0.00</h3>
+                    </div>
+                    <div class="p-3 bg-vault-gold/10 text-vault-gold rounded-xl"><i class="fa-solid fa-chart-line text-xl"></i></div>
+                </div>
+            </div>
+            <div class="bg-vault-card border border-vault-border rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Face Value Total</p>
+                        <h3 id="statFaceValue" class="text-2xl sm:text-3xl font-cinzel font-bold text-white mt-1">0</h3>
+                    </div>
+                    <div class="p-3 bg-vault-gold/10 text-vault-gold rounded-xl"><i class="fa-solid fa-money-bill-wave text-xl"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="bg-vault-card border border-vault-border rounded-2xl p-4 sm:p-6 mb-8 shadow-xl flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="relative w-full md:w-96">
+                <i class="fa-solid fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                <input type="text" id="searchInput" oninput="renderVault()" placeholder="Search currency, country..." class="w-full bg-vault-dark border border-vault-border rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-500 gold-border outline-none transition-all">
+            </div>
+            <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+                <select id="sortSelect" onchange="renderVault()" class="bg-vault-dark border border-vault-border rounded-xl px-4 py-3 text-sm text-white gold-border outline-none">
+                    <option value="newest">Newest Added</option>
+                    <option value="valueDesc">Highest Market Value</option>
+                    <option value="country">Country (A-Z)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Vault Currency Grid / Empty State -->
+        <div id="vaultContainer">
+            <!-- Dynamically populated via JS -->
+        </div>
+
+    </main>
+
+    <!-- Add / Edit Modal -->
+    <div id="currencyModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-vault-card border border-vault-border rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="modalTitle" class="font-cinzel font-bold text-xl text-white">Add New Currency</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="currencyForm" onsubmit="saveCurrency(event)" class="space-y-4">
+                <input type="hidden" id="editIndex" value="-1">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Country</label>
+                        <input type="text" id="formCountry" required placeholder="e.g., Qatar" class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Currency Name</label>
+                        <input type="text" id="formName" required placeholder="e.g., Qatari Riyal" class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Denomination & Value</label>
+                        <input type="text" id="formDenomination" required placeholder="e.g., 50" class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Condition Grade</label>
+                        <select id="formGrade" class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none">
+                            <option value="UNC">UNC (Uncirculated)</option>
+                            <option value="XF">XF (Extremely Fine)</option>
+                            <option value="VF">VF (Very Fine)</option>
+                            <option value="Historic">Historic / Vintage</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Est. Market Value (QAR)</label>
+                        <input type="number" step="0.01" id="formMarketValue" required placeholder="0.00" class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Face Value (QAR)</label>
+                        <input type="number" step="0.01" id="formFaceValue" required placeholder="0.00" class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Image URL (Optional)</label>
+                    <input type="url" id="formImage" placeholder="https://example.com/banknote.jpg" class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Collector Notes</label>
+                    <textarea id="formNotes" rows="2" placeholder="Add serial number, year, or special details..." class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-xl border border-vault-border text-gray-300 text-sm hover:bg-vault-border/50">Cancel</button>
+                    <button type="submit" class="bg-gradient-to-r from-vault-gold to-vault-goldDark text-black font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg hover:opacity-90">Save Currency</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        let vaultCollection = JSON.parse(localStorage.getItem('qutra_vault_items')) || [];
+
+        function toggleMenu() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('button')) {
+                document.getElementById('dropdownMenu').classList.add('hidden');
+            }
+        });
+
+        function updateStats() {
+            document.getElementById('statTotalItems').innerText = vaultCollection.length;
+            const countries = [...new Set(vaultCollection.map(item => item.country))];
+            document.getElementById('statTotalCountries').innerText = countries.length;
+            
+            const totalMarket = vaultCollection.reduce((acc, item) => acc + parseFloat(item.marketValue || 0), 0);
+            document.getElementById('statPortfolioValue').innerText = `QAR ${totalMarket.toFixed(2)}`;
+
+            const totalFace = vaultCollection.reduce((acc, item) => acc + parseFloat(item.faceValue || 0), 0);
+            document.getElementById('statFaceValue').innerText = totalFace.toLocaleString();
+        }
+
+        function renderVault() {
+            const container = document.getElementById('vaultContainer');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const sortBy = document.getElementById('sortSelect').value;
+
+            let filtered = vaultCollection.filter(item => 
+                item.country.toLowerCase().includes(searchTerm) || 
+                item.name.toLowerCase().includes(searchTerm) ||
+                item.denomination.toLowerCase().includes(searchTerm)
+            );
+
+            if (sortBy === 'valueDesc') {
+                filtered.sort((a, b) => parseFloat(b.marketValue) - parseFloat(a.marketValue));
+            } else if (sortBy === 'country') {
+                filtered.sort((a, b) => a.country.localeCompare(b.country));
+            }
+
+            updateStats();
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-20 bg-vault-card border border-vault-border rounded-3xl p-8">
+                        <div class="w-16 h-16 bg-vault-gold/10 text-vault-gold rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
+                            <i class="fa-solid fa-vault"></i>
+                        </div>
+                        <h3 class="font-cinzel font-bold text-xl text-white mb-2">Your Vault is Empty</h3>
+                        <p class="text-gray-400 text-sm max-w-md mx-auto mb-6">Start building your numismatic archive by adding your first banknote or coin collection item.</p>
+                        <button onclick="openAddModal()" class="bg-gradient-to-r from-vault-gold to-vault-goldDark text-black font-semibold px-6 py-3 rounded-xl text-sm shadow-lg hover:opacity-90 inline-flex items-center space-x-2">
+                            <i class="fa-solid fa-plus"></i><span>Add First Currency</span>
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+            filtered.forEach((item, index) => {
+                const originalIndex = vaultCollection.indexOf(item);
+                html += `
+                    <div class="bg-vault-card border border-vault-border rounded-2xl overflow-hidden shadow-xl hover:border-vault-gold/50 transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="h-48 bg-vault-dark relative overflow-hidden flex items-center justify-center border-b border-vault-border">
+                                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">` : `<div class="text-vault-gold/40 text-4xl"><i class="fa-solid fa-money-bill-transfer"></i></div>`}
+                                <span class="absolute top-3 right-3 bg-black/70 backdrop-blur-md text-vault-gold text-xs font-semibold px-3 py-1 rounded-full border border-vault-border">${item.grade}</span>
+                                <span class="absolute top-3 left-3 bg-black/70 backdrop-blur-md text-white text-xs font-semibold px-3 py-1 rounded-full border border-vault-border">${item.country}</span>
+                            </div>
+                            <div class="p-5">
+                                <h4 class="font-cinzel font-bold text-lg text-white mb-1">${item.denomination} ${item.name}</h4>
+                                <p class="text-xs text-gray-400 mb-4 line-clamp-2">${item.notes || 'No additional collector notes added.'}</p>
+                            </div>
+                        </div>
+                        <div class="p-5 pt-0 flex items-center justify-between border-t border-vault-border/50 mt-auto pt-4">
+                            <div>
+                                <span class="text-xs text-gray-400 block">Est. Market Value</span>
+                                <span class="font-cinzel font-bold text-vault-gold text-base">QAR ${parseFloat(item.marketValue).toFixed(2)}</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="editCurrency(${originalIndex})" class="p-2 rounded-xl bg-vault-dark text-gray-300 hover:text-vault-gold border border-vault-border"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="deleteCurrency(${originalIndex})" class="p-2 rounded-xl bg-vault-dark text-gray-300 hover:text-red-400 border border-vault-border"><i class="fa-solid fa-trash text-xs"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').innerText = 'Add New Currency';
+            document.getElementById('editIndex').value = '-1';
+            document.getElementById('currencyForm').reset();
+            document.getElementById('currencyModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('currencyModal').classList.add('hidden');
+        }
+
+        function saveCurrency(e) {
+            e.preventDefault();
+            const index = parseInt(document.getElementById('editIndex').value);
+            const newItem = {
+                country: document.getElementById('formCountry').value,
+                name: document.getElementById('formName').value,
+                denomination: document.getElementById('formDenomination').value,
+                grade: document.getElementById('formGrade').value,
+                marketValue: parseFloat(document.getElementById('formMarketValue').value) || 0,
+                faceValue: parseFloat(document.getElementById('formFaceValue').value) || 0,
+                image: document.getElementById('formImage').value,
+                notes: document.getElementById('formNotes').value
+            };
+
+            if (index === -1) {
+                vaultCollection.unshift(newItem);
+            } else {
+                vaultCollection[index] = newItem;
+            }
+
+            localStorage.setItem('qutra_vault_items', JSON.stringify(vaultCollection));
+            closeModal();
+            renderVault();
+        }
+
+        function editCurrency(index) {
+            const item = vaultCollection[index];
+            document.getElementById('modalTitle').innerText = 'Edit Currency';
+            document.getElementById('editIndex').value = index;
+            document.getElementById('formCountry').value = item.country;
+            document.getElementById('formName').value = item.name;
+            document.getElementById('formDenomination').value = item.denomination;
+            document.getElementById('formGrade').value = item.grade;
+            document.getElementById('formMarketValue').value = item.marketValue;
+            document.getElementById('formFaceValue').value = item.faceValue;
+            document.getElementById('formImage').value = item.image || '';
+            document.getElementById('formNotes').value = item.notes || '';
+            document.getElementById('currencyModal').classList.remove('hidden');
+        }
+
+        function deleteCurrency(index) {
+            if (confirm('Are you sure you want to remove this currency from your vault?')) {
+                vaultCollection.splice(index, 1);
+                localStorage.setItem('qutra_vault_items', JSON.stringify(vaultCollection));
+                renderVault();
+            }
+        }
+
+        function resetVault() {
+            if (confirm('Are you sure you want to clear your entire vault? This action cannot be undone.')) {
+                vaultCollection = [];
+                localStorage.removeItem('qutra_vault_items');
+                renderVault();
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(vaultCollection, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "qutra_vault_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        vaultCollection = imported;
+                        localStorage.setItem('qutra_vault_items', JSON.stringify(vaultCollection));
+                        renderVault();
+                        alert('Vault successfully imported!');
+                    } else {
+                        alert('Invalid backup file format.');
+                    }
+                } catch (err) {
+                    alert('Error reading JSON file.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Initialize view on load
+        renderVault();
+    </script>
+</body>
+</html>
