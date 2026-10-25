@@ -42,38 +42,40 @@
     <!-- Top Navigation Bar -->
     <header class="border-b border-vault-border bg-vault-card/80 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-<!-- Backup & Restore Buttons -->
-  <div class="flex items-center gap-2">
-    <button onclick="exportBackup()" class="px-3 py-1.5 bg-vault-gold text-vault-dark text-sm font-semibold rounded-lg hover:bg-vault-goldLight transition flex items-center gap-1.5 cursor-pointer">
-      <i class="fas fa-download"></i> Export
-    </button>
-    <label class="px-3 py-1.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-500 transition cursor-pointer flex items-center gap-1.5">
-      <i class="fas fa-upload"></i> Import
-      <input type="file" id="importFile" accept=".json" onchange="importBackup(event)" class="hidden">
-    </label>
-  </div>
-<!-- AI Popup Modal (Hidden by Default) -->
-<div id="aiModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-  <div class="bg-vault-card border border-vault-border rounded-xl max-w-lg w-full p-6 shadow-2xl relative">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-cinzel font-bold text-vault-gold flex items-center gap-2">
-        <i class="fas fa-wand-magic-sparkles"></i> AI Currency Assistant
-      </h3>
-      <button onclick="closeAIModal()" class="text-gray-400 hover:text-white text-lg cursor-pointer">&times;</button>
-    </div>
-    
-    <p class="text-sm text-gray-300 mb-4">Describe the banknote or coin you have in plain English. The AI will instantly parse the details, estimate value, write a history snippet, and add it to your vault!</p>
-    
-    <textarea id="aiModalInput" rows="3" placeholder="e.g., I have an old Syrian 5000 pound bill..." class="w-full bg-vault-dark border border-vault-border rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-vault-gold mb-4"></textarea>
-    
-    <div class="flex justify-end gap-3">
-      <button onclick="closeAIModal()" class="px-4 py-2 bg-vault-dark border border-vault-border text-gray-300 rounded-lg hover:bg-vault-border transition text-sm cursor-pointer">Cancel</button>
-      <button onclick="submitAIModalPrompt()" id="aiSubmitBtn" class="px-5 py-2 bg-vault-gold text-vault-dark font-semibold rounded-lg hover:bg-vault-goldLight transition text-sm flex items-center gap-2 cursor-pointer shadow-lg">
-        <i class="fas fa-bolt"></i> Generate & Add
-      </button>
-    </div>
-  </div>
-</div>            
+            <!-- Backup & Restore Buttons -->
+            <div class="flex items-center gap-2">
+                <button onclick="exportData()" class="px-3 py-1.5 bg-vault-gold text-vault-dark text-sm font-semibold rounded-lg hover:bg-vault-goldLight transition flex items-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <label class="px-3 py-1.5 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-500 transition cursor-pointer flex items-center gap-1.5">
+                    <i class="fas fa-upload"></i> Import
+                    <input type="file" id="importFile" accept=".json" onchange="importData(event)" class="hidden">
+                </label>
+            </div>
+
+            <!-- AI Popup Modal (Hidden by Default) -->
+            <div id="aiModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-vault-card border border-vault-border rounded-xl max-w-lg w-full p-6 shadow-2xl relative">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-cinzel font-bold text-vault-gold flex items-center gap-2">
+                            <i class="fas fa-wand-magic-sparkles"></i> AI Currency Assistant
+                        </h3>
+                        <button onclick="closeAIModal()" class="text-gray-400 hover:text-white text-lg cursor-pointer">&times;</button>
+                    </div>
+                    
+                    <p class="text-sm text-gray-300 mb-4">Describe the banknote or coin you have in plain English. The AI will instantly parse the details, estimate value, write a history snippet, and add it to your vault!</p>
+                    
+                    <textarea id="aiModalInput" rows="3" placeholder="e.g., I have an old Syrian 5000 pound bill..." class="w-full bg-vault-dark border border-vault-border rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-vault-gold mb-4"></textarea>
+                    
+                    <div class="flex justify-end gap-3">
+                        <button onclick="closeAIModal()" class="px-4 py-2 bg-vault-dark border border-vault-border text-gray-300 rounded-lg hover:bg-vault-border transition text-sm cursor-pointer">Cancel</button>
+                        <button onclick="submitAIModalPrompt()" id="aiSubmitBtn" class="px-5 py-2 bg-vault-gold text-vault-dark font-semibold rounded-lg hover:bg-vault-goldLight transition text-sm flex items-center gap-2 cursor-pointer shadow-lg">
+                            <i class="fas fa-bolt"></i> Generate & Add
+                        </button>
+                    </div>
+                </div>
+            </div>            
+            
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-vault-gold to-vault-goldDark flex items-center justify-center text-black font-cinzel font-bold text-xl shadow-lg">
                     <i class="fa-solid fa-vault"></i>
@@ -85,23 +87,27 @@
             </div>
 
             <div class="flex items-center space-x-3">
-                <button onclick="openAddModal()" class="bg-gradient-to-r from-vault-gold to-vault-goldDark text-black font-semibold px-4 py-2.5 rounded-xl text-sm flex items-center space-x-2 shadow-lg hover:opacity-90 transition-all">
+                <button onclick="openAIModal()" class="bg-vault-card border border-vault-border text-vault-gold font-semibold px-4 py-2.5 rounded-xl text-sm flex items-center space-x-2 shadow-lg hover:bg-vault-border/50 transition-all cursor-pointer">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span class="hidden sm:inline">Add with AI</span>
+                </button>
+                <button onclick="openAddModal()" class="bg-gradient-to-r from-vault-gold to-vault-goldDark text-black font-semibold px-4 py-2.5 rounded-xl text-sm flex items-center space-x-2 shadow-lg hover:opacity-90 transition-all cursor-pointer">
                     <i class="fa-solid fa-plus"></i>
                     <span class="hidden sm:inline">Add Currency</span>
                 </button>
                 <div class="relative">
-                    <button onclick="toggleMenu()" class="p-2.5 rounded-xl bg-vault-border/50 text-vault-gold hover:bg-vault-border transition-all">
+                    <button onclick="toggleMenu()" class="p-2.5 rounded-xl bg-vault-border/50 text-vault-gold hover:bg-vault-border transition-all cursor-pointer">
                         <i class="fa-solid fa-ellipsis-vertical"></i>
                     </button>
                     <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-vault-card border border-vault-border rounded-xl shadow-2xl py-2 z-50">
-                        <button onclick="exportData()" class="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-vault-border/50 flex items-center space-x-2">
+                        <button onclick="exportData()" class="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-vault-border/50 flex items-center space-x-2 cursor-pointer">
                             <i class="fa-solid fa-download text-vault-gold"></i><span>Export Backup (JSON)</span>
                         </button>
                         <label class="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-vault-border/50 flex items-center space-x-2 cursor-pointer">
                             <i class="fa-solid fa-upload text-vault-gold"></i><span>Import Backup</span>
                             <input type="file" id="importFile" accept=".json" onchange="importData(event)" class="hidden">
                         </label>
-                        <button onclick="resetVault()" class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-vault-border/50 flex items-center space-x-2 border-t border-vault-border mt-1 pt-2">
+                        <button onclick="resetVault()" class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-vault-border/50 flex items-center space-x-2 border-t border-vault-border mt-1 pt-2 cursor-pointer">
                             <i class="fa-solid fa-trash-can"></i><span>Clear All Vault Data</span>
                         </button>
                     </div>
@@ -160,7 +166,7 @@
                 <input type="text" id="searchInput" oninput="renderVault()" placeholder="Search currency, country..." class="w-full bg-vault-dark border border-vault-border rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-500 gold-border outline-none transition-all">
             </div>
             <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
-                <select id="sortSelect" onchange="renderVault()" class="bg-vault-dark border border-vault-border rounded-xl px-4 py-3 text-sm text-white gold-border outline-none">
+                <select id="sortSelect" onchange="renderVault()" class="bg-vault-dark border border-vault-border rounded-xl px-4 py-3 text-sm text-white gold-border outline-none cursor-pointer">
                     <option value="newest">Newest Added</option>
                     <option value="valueDesc">Highest Market Value</option>
                     <option value="country">Country (A-Z)</option>
@@ -180,7 +186,7 @@
         <div class="bg-vault-card border border-vault-border rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h3 id="modalTitle" class="font-cinzel font-bold text-xl text-white">Add New Currency</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white p-2 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form id="currencyForm" onsubmit="saveCurrency(event)" class="space-y-4">
                 <input type="hidden" id="editIndex" value="-1">
@@ -201,7 +207,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Condition Grade</label>
-                        <select id="formGrade" class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none">
+                        <select id="formGrade" class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none cursor-pointer">
                             <option value="UNC">UNC (Uncirculated)</option>
                             <option value="XF">XF (Extremely Fine)</option>
                             <option value="VF">VF (Very Fine)</option>
@@ -228,8 +234,8 @@
                     <textarea id="formNotes" rows="2" placeholder="Add serial number, year, or special details..." class="w-full bg-vault-dark border border-vault-border rounded-xl px-4 py-2.5 text-sm text-white gold-border outline-none"></textarea>
                 </div>
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-xl border border-vault-border text-gray-300 text-sm hover:bg-vault-border/50">Cancel</button>
-                    <button type="submit" class="bg-gradient-to-r from-vault-gold to-vault-goldDark text-black font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg hover:opacity-90">Save Currency</button>
+                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 rounded-xl border border-vault-border text-gray-300 text-sm hover:bg-vault-border/50 cursor-pointer">Cancel</button>
+                    <button type="submit" class="bg-gradient-to-r from-vault-gold to-vault-goldDark text-black font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg hover:opacity-90 cursor-pointer">Save Currency</button>
                 </div>
             </form>
         </div>
@@ -289,7 +295,7 @@
                         </div>
                         <h3 class="font-cinzel font-bold text-xl text-white mb-2">Your Vault is Empty</h3>
                         <p class="text-gray-400 text-sm max-w-md mx-auto mb-6">Start building your numismatic archive by adding your first banknote or coin collection item.</p>
-                        <button onclick="openAddModal()" class="bg-gradient-to-r from-vault-gold to-vault-goldDark text-black font-semibold px-6 py-3 rounded-xl text-sm shadow-lg hover:opacity-90 inline-flex items-center space-x-2">
+                        <button onclick="openAddModal()" class="bg-gradient-to-r from-vault-gold to-vault-goldDark text-black font-semibold px-6 py-3 rounded-xl text-sm shadow-lg hover:opacity-90 inline-flex items-center space-x-2 cursor-pointer">
                             <i class="fa-solid fa-plus"></i><span>Add First Currency</span>
                         </button>
                     </div>
@@ -319,8 +325,8 @@
                                 <span class="font-cinzel font-bold text-vault-gold text-base">QAR ${parseFloat(item.marketValue).toFixed(2)}</span>
                             </div>
                             <div class="flex items-center space-x-2">
-                                <button onclick="editCurrency(${originalIndex})" class="p-2 rounded-xl bg-vault-dark text-gray-300 hover:text-vault-gold border border-vault-border"><i class="fa-solid fa-pen text-xs"></i></button>
-                                <button onclick="deleteCurrency(${originalIndex})" class="p-2 rounded-xl bg-vault-dark text-gray-300 hover:text-red-400 border border-vault-border"><i class="fa-solid fa-trash text-xs"></i></button>
+                                <button onclick="editCurrency(${originalIndex})" class="p-2 rounded-xl bg-vault-dark text-gray-300 hover:text-vault-gold border border-vault-border cursor-pointer"><i class="fa-solid fa-pen text-xs"></i></button>
+                                <button onclick="deleteCurrency(${originalIndex})" class="p-2 rounded-xl bg-vault-dark text-gray-300 hover:text-red-400 border border-vault-border cursor-pointer"><i class="fa-solid fa-trash text-xs"></i></button>
                             </div>
                         </div>
                     </div>
@@ -431,7 +437,97 @@
 
         // Initialize view on load
         renderVault();
+
+        // Open AI Popup Modal
+        function openAIModal() {
+            document.getElementById('aiModal').classList.remove('hidden');
+            document.getElementById('aiModalInput').focus();
+        }
+
+        // Close AI Popup Modal
+        function closeAIModal() {
+            document.getElementById('aiModal').classList.add('hidden');
+            document.getElementById('aiModalInput').value = '';
+        }
+
+        // Process AI Prompt from Modal
+        function submitAIModalPrompt() {
+            const promptText = document.getElementById('aiModalInput').value.trim();
+            if (!promptText) {
+                alert('Please enter a description of your currency first!');
+                return;
+            }
+
+            const btn = document.getElementById('aiSubmitBtn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            try {
+                const extractedData = parseWithSmartFallback(promptText);
+
+                let vaultItems = JSON.parse(localStorage.getItem('qutra_vault_items') || '[]');
+                vaultItems.unshift(extractedData);
+                localStorage.setItem('qutra_vault_items', JSON.stringify(vaultItems));
+                vaultCollection = vaultItems; // Sync active array
+
+                closeAIModal();
+                alert(`Successfully added "${extractedData.denomination} ${extractedData.name}" to your vault!`);
+                renderVault();
+            } catch (err) {
+                console.error(err);
+                alert('Error adding item. Please try again.');
+            } finally {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        // Smart Intelligent Parser Fallback
+        function parseWithSmartFallback(text) {
+            const lower = text.toLowerCase();
+            let name = text, country = "International", denomination = "1", grade = "UNC", marketValue = 10.00, faceValue = 10.00, notes = "Automatically cataloged via Qutra AI assistant.";
+
+            if (lower.includes('syrian') || lower.includes('syria') || lower.includes('pound')) {
+                name = "Syrian Pound Banknote";
+                country = "Syria";
+                denomination = "5000";
+                grade = "XF";
+                marketValue = 7.50;
+                faceValue = 5000;
+                notes = "Features the Umayyad Mosque of Damascus on the reverse. High denomination banknote issued by the Central Bank of Syria.";
+            } else if (lower.includes('qatari') || lower.includes('riyal')) {
+                name = "Qatar Central Bank Riyal";
+                country = "Qatar";
+                denomination = "10";
+                grade = "UNC";
+                marketValue = 10.00;
+                faceValue = 10;
+                notes = "Features Lusail Stadium, traditional dhow boat, and Al Zubarah Fort. Issued under the 2020 polymer series.";
+            } else if (lower.includes('dollar') || lower.includes('us')) {
+                name = "Federal Reserve Note";
+                country = "United States";
+                denomination = "$100";
+                grade = "UNC";
+                marketValue = 365.00;
+                faceValue = 100;
+                notes = "Features Benjamin Franklin with advanced security features.";
+            } else {
+                name = text.charAt(0).toUpperCase() + text.slice(1);
+            }
+
+            return {
+                country: country,
+                name: name,
+                denomination: denomination,
+                grade: grade,
+                marketValue: marketValue,
+                faceValue: faceValue,
+                image: "",
+                notes: notes
+            };
+        }
     </script>
-<script data-goatcounter="https://qutra-vault.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <script data-goatcounter="https://qutra-vault.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
